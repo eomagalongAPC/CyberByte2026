@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scanner - Campus Admin Dashboard</title>
+    <style>
+        /* Base Styling & Variables */
+        :root {
+            --primary: #4F46E5;
+            --primary-light: rgba(187, 215, 2, 0.1);
+            --secondary: #10B981;
+            --secondary-light: rgba(16, 185, 129, 0.1);
+            --danger: #EF4444;
+            --danger-light: rgba(239, 68, 68, 0.1);
+            --accent: #A855F7;
+            --accent-light: rgba(168, 85, 247, 0.1);
+            
+            --bg-body: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --border-color: #E2E8F0;
+            --text-main: #3f6294;
+            --text-sub: #6B7280;
+            --font-main: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body.dark-mode {
+            --bg-body: #1a1f35;
+            --bg-card: #242d45;
+            --border-color: #3a4456;
+            --text-main: #e0e7ff;
+            --text-sub: #a0aec0;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
+        body { 
+            font-family: var(--font-main);
+            background: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            transition: 0.3s;
+        }
+
+        /* Sidebar Navigation */
+        nav {
+            width: 240px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 16px;
+            overflow-y: auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-section { border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 30px; }
+        .brand-name { font-size: 1.25rem; font-weight: 800; color: var(--text-main); }
+        .brand-sub { font-size: 0.9rem; color: var(--text-sub); }
+        .nav-link { color: var(--text-sub); text-decoration: none; padding: 12px 0; display: flex; align-items: center; gap: 10px; font-weight: 500; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { color: var(--primary); }
+
+        main { 
+            flex: 1; 
+            padding: 12px 14px; 
+            min-width: 0; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 12px; }
+        .header-left h1 { font-size: 1.35rem; font-weight: 700; margin-bottom: 2px; }
+        .header-left p { color: var(--text-sub); }
+
+        .header-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+        .theme-btn { background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
+        .theme-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .refresh-btn { background: var(--primary); color: white; border: none; padding: 9px 16px; border-radius: 8px; font-weight: 600; font-size: 0.88rem; display: flex; align-items: center; gap: 8px; cursor: pointer; text-decoration: none; }
+        .refresh-btn:hover { background: #4239d6; }
+
+        .card {
+            background: var(--bg-card); 
+            border-radius: 12px; 
+            border: 1px solid var(--border-color); 
+            padding: 12px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 8px;
+        }
+
+        .card h2 { margin: 0 0 6px 0; font-size: 1.1rem; color: var(--text-main); }
+        .card p { color: var(--text-sub); margin: 0 0 8px 0; }
+
+        .scanner-container {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        .scanner-container .card {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .video-box {
+            background: var(--bg-body);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-box video {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn:hover { background: #4239d6; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .scanned-data {
+            background: var(--secondary-light);
+            border: 1px solid var(--secondary);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            color: var(--text-main);
+        }
+
+        .error {
+            background: var(--danger-light);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        @media (max-height: 840px) { main { padding: 12px 18px; } }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="brand-section">
+            <div class="brand-name">Campus Admin</div>
+            <div class="brand-sub">Dashboard System</div>
+        </div>
+        <a href="index.html" class="nav-link"><span>📊</span> Dashboard Overview</a>
+        <a href="qr-scanner.html" class="nav-link active"><span>📱</span> QR Scanner</a>
+        <a href="student-registration.html" class="nav-link"><span>👥</span> Students Registry</a>
+        <a href="reports.html" class="nav-link"><span>📈</span> Reports</a>
+        <a href="admin.html" class="nav-link"><span>⚙️</span> Admin Panel</a>
+    </nav>
+
+    <main>
+        <div class="header">
+            <div class="header-left">
+                <p>Attendance & Verification</p>
+                <h1>QR Code Scanner</h1>
+            </div>
+            <div class="header-right">
+                <button id="theme-toggle" class="theme-btn" title="Toggle dark mode">☀️</button>
+                <a class="refresh-btn" href="admin.html">Admin Panel</a>
+            </div>
+        </div>
+
+        <div class="scanner-container">
+            <div class="card">
+                <h2>📱 Real-time Scanner</h2>
+                <p>Point your device camera at a QR code to scan attendance records.</p>
+                
+                <div class="video-box">
+                    <div id="scanner-placeholder" style="color: var(--text-sub); text-align: center;">
+                        <p>Camera access required</p>
+                        <button class="btn" onclick="initCamera()">Enable Camera</button>
+                    </div>
+                    <video id="scanner-video" style="display:none;"></video>
+                </div>
+
+                <button class="btn" id="toggle-camera">Start Scanner</button>
+                <div id="scanner-result"></div>
+            </div>
+
+            <div class="card">
+                <h2>✅ Recent Scans</h2>
+                <p>Last 10 QR codes scanned in this session.</p>
+                <div id="scan-history" style="color: var(--text-sub); padding: 12px; background: var(--bg-body); border-radius: 8px; min-height: 100px;">
+                    <p>No scans yet</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '🌙';
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeToggle.textContent = '☀️';
+            }
+            localStorage.setItem('theme', theme);
+        }
+        
+        setTheme(savedTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.body.classList.contains('dark-mode');
+            setTheme(isDark ? 'light' : 'dark');
+        });
+
+        // Scanner functionality
+        let videoStream = null;
+        const scanHistory = [];
+
+        async function initCamera() {
+            try {
+                const constraints = { video: { facingMode: 'environment' } };
+                videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+                document.getElementById('scanner-video').srcObject = videoStream;
+                document.getElementById('scanner-placeholder').style.display = 'none';
+                document.getElementById('scanner-video').style.display = 'block';
+                document.getElementById('toggle-camera').textContent = 'Stop Scanner';
+            } catch (error) {
+                const result = document.getElementById('scanner-result');
+                result.innerHTML = `<div class="scanned-data error">Camera access denied. Please enable camera permissions.</div>`;
+            }
+        }
+
+        document.getElementById('toggle-camera').addEventListener('click', () => {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+                document.getElementById('scanner-video').style.display = 'none';
+                document.getElementById('scanner-placeholder').style.display = 'block';
+                document.getElementById('toggle-camera').textContent = 'Start Scanner';
+            } else {
+                initCamera();
+            }
+        });
+
+        // Simulate QR scan
+        function simulateScan() {
+            const codes = ['ACC-DXJK2K', 'ACC-RF9KH3', 'ACC-LQMK8P', 'ACC-9DNXK2'];
+            const randomCode = codes[Math.floor(Math.random() * codes.length)];
+            const timestamp = new Date().toLocaleTimeString();
+
+            scanHistory.unshift({ code: randomCode, time: timestamp });
+            if (scanHistory.length > 10) scanHistory.pop();
+
+            const result = document.getElementById('scanner-result');
+            result.innerHTML = `<div class="scanned-data">
+                <strong>✓ Scan Successful</strong><br>
+                Session ID: ${randomCode}<br>
+                Time: ${timestamp}
+            </div>`;
+
+            updateHistory();
+        }
+
+        function updateHistory() {
+            const historyDiv = document.getElementById('scan-history');
+            if (scanHistory.length === 0) {
+                historyDiv.innerHTML = '<p>No scans yet</p>';
+                return;
+            }
+            historyDiv.innerHTML = scanHistory.map((item, idx) => 
+                `<div style="padding: 8px; border-bottom: 1px solid var(--border-color);">
+                    <strong>${idx + 1}.</strong> ${item.code} at ${item.time}
+                </div>`
+            ).join('');
+        }
+
+        // Demo: Simulate scan every 5 seconds when camera is active
+        setInterval(() => {
+            if (videoStream && document.getElementById('scanner-video').style.display !== 'none') {
+                simulateScan();
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

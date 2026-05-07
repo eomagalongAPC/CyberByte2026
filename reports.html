@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Campus Admin Dashboard</title>
+    <style>
+        /* Base Styling & Variables */
+        :root {
+            --primary: #4F46E5;
+            --primary-light: rgba(187, 215, 2, 0.1);
+            --secondary: #10B981;
+            --secondary-light: rgba(16, 185, 129, 0.1);
+            --danger: #EF4444;
+            --danger-light: rgba(239, 68, 68, 0.1);
+            --accent: #A855F7;
+            --accent-light: rgba(168, 85, 247, 0.1);
+            
+            --bg-body: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --border-color: #E2E8F0;
+            --text-main: #3f6294;
+            --text-sub: #6B7280;
+            --font-main: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body.dark-mode {
+            --bg-body: #1a1f35;
+            --bg-card: #242d45;
+            --border-color: #3a4456;
+            --text-main: #e0e7ff;
+            --text-sub: #a0aec0;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
+        body { 
+            font-family: var(--font-main);
+            background: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            transition: 0.3s;
+        }
+
+        /* Sidebar Navigation */
+        nav {
+            width: 240px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 16px;
+            overflow-y: auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-section { border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 30px; }
+        .brand-name { font-size: 1.25rem; font-weight: 800; color: var(--text-main); }
+        .brand-sub { font-size: 0.9rem; color: var(--text-sub); }
+        .nav-link { color: var(--text-sub); text-decoration: none; padding: 12px 0; display: flex; align-items: center; gap: 10px; font-weight: 500; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { color: var(--primary); }
+
+        main { 
+            flex: 1; 
+            padding: 12px 14px; 
+            min-width: 0; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 12px; }
+        .header-left h1 { font-size: 1.35rem; font-weight: 700; margin-bottom: 2px; }
+        .header-left p { color: var(--text-sub); }
+
+        .header-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+        .theme-btn { background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
+        .theme-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .refresh-btn { background: var(--primary); color: white; border: none; padding: 9px 16px; border-radius: 8px; font-weight: 600; font-size: 0.88rem; display: flex; align-items: center; gap: 8px; cursor: pointer; text-decoration: none; }
+        .refresh-btn:hover { background: #4239d6; }
+
+        .card {
+            background: var(--bg-card); 
+            border-radius: 12px; 
+            border: 1px solid var(--border-color); 
+            padding: 12px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 8px;
+        }
+
+        .card h2 { margin: 0 0 6px 0; font-size: 1.1rem; color: var(--text-main); }
+        .card p { color: var(--text-sub); margin: 0 0 8px 0; }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .stat-box {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-label { color: var(--text-sub); font-size: 0.85rem; }
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); margin: 4px 0; }
+        .stat-change { color: var(--secondary); font-size: 0.85rem; }
+
+        .chart-container {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            height: 100px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 6px;
+        }
+
+        .reports-content {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .reports-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .reports-right {
+            flex: 1;
+        }
+
+        .chart-bar {
+            background: linear-gradient(180deg, var(--primary), rgba(79, 70, 229, 0.5));
+            border-radius: 4px 4px 0 0;
+            min-width: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            color: var(--text-sub);
+            font-size: 0.7rem;
+            padding-top: 4px;
+            transition: 0.2s;
+        }
+
+        .chart-bar:hover { background: linear-gradient(180deg, #4239d6, rgba(79, 70, 229, 0.7)); }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-card);
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn:hover { background: #4239d6; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th {
+            background: var(--bg-body);
+            padding: 6px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 6px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover { background: var(--primary-light); }
+
+        @media (max-height: 840px) { main { padding: 12px 18px; } }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="brand-section">
+            <div class="brand-name">Campus Admin</div>
+            <div class="brand-sub">Dashboard System</div>
+        </div>
+        <a href="index.html" class="nav-link"><span>📊</span> Dashboard Overview</a>
+        <a href="qr-scanner.html" class="nav-link"><span>📱</span> QR Scanner</a>
+        <a href="student-registration.html" class="nav-link"><span>👥</span> Students Registry</a>
+        <a href="reports.html" class="nav-link active"><span>📈</span> Reports</a>
+        <a href="admin.html" class="nav-link"><span>⚙️</span> Admin Panel</a>
+    </nav>
+
+    <main>
+        <div class="header">
+            <div class="header-left">
+                <p>Analytics & Insights</p>
+                <h1>Attendance Reports</h1>
+            </div>
+            <div class="header-right">
+                <button id="theme-toggle" class="theme-btn" title="Toggle dark mode">☀️</button>
+                <a class="refresh-btn" href="admin.html">Admin Panel</a>
+            </div>
+        </div>
+
+        <div class="reports-content">
+            <div class="reports-left">
+                <div class="card">
+                    <h2>📊 Overview Statistics</h2>
+                    <p>Key attendance metrics for this month.</p>
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Total Sessions</div>
+                            <div class="stat-value">156</div>
+                            <div class="stat-change">↑ 12 from last month</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Avg Attendance</div>
+                            <div class="stat-value">94%</div>
+                            <div class="stat-change">↑ 3% improvement</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Total Students</div>
+                            <div class="stat-value">1,248</div>
+                            <div class="stat-change">↑ 48 new registrations</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Absent Rate</div>
+                            <div class="stat-value">6%</div>
+                            <div class="stat-change">↓ 2% reduction</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reports-right">
+                <div class="card">
+                    <h2>📈 Weekly Attendance Trend</h2>
+                    <p>Attendance rate by day this week.</p>
+                    <div class="chart-container">
+                    <div class="chart-bar" style="height: 78%;" title="Monday: 78%">
+                        <span>78%</span>
+                        <span style="font-size: 0.65rem;">Mon</span>
+                    </div>
+                    <div class="chart-bar" style="height: 84%;" title="Tuesday: 84%">
+                        <span>84%</span>
+                        <span style="font-size: 0.65rem;">Tue</span>
+                    </div>
+                    <div class="chart-bar" style="height: 91%;" title="Wednesday: 91%">
+                        <span>91%</span>
+                        <span style="font-size: 0.65rem;">Wed</span>
+                    </div>
+                    <div class="chart-bar" style="height: 88%;" title="Thursday: 88%">
+                        <span>88%</span>
+                        <span style="font-size: 0.65rem;">Thu</span>
+                    </div>
+                    <div class="chart-bar" style="height: 95%;" title="Friday: 95%">
+                        <span>95%</span>
+                        <span style="font-size: 0.65rem;">Fri</span>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+
+            <div class="card">
+                <h2>📋 Detailed Attendance Log</h2>
+                <p>Export and filter attendance records.</p>
+                
+                <div class="filter-group">
+                    <select id="filter-section">
+                        <option value="">All Sections</option>
+                        <option value="A-1">Section A-1</option>
+                        <option value="B-1">Section B-1</option>
+                        <option value="C-1">Section C-1</option>
+                    </select>
+                    <select id="filter-period">
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="quarter">This Quarter</option>
+                    </select>
+                    <button class="btn">Export to CSV</button>
+                    <button class="btn">Print Report</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Section</th>
+                            <th>Present</th>
+                            <th>Absent</th>
+                            <th>Late</th>
+                            <th>Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Dec 13, 2024</td>
+                            <td>A-1</td>
+                            <td>38</td>
+                            <td>2</td>
+                            <td>2</td>
+                            <td style="color: var(--secondary); font-weight: 600;">95%</td>
+                        </tr>
+                        <tr>
+                            <td>Dec 13, 2024</td>
+                            <td>B-1</td>
+                            <td>35</td>
+                            <td>3</td>
+                            <td>1</td>
+                            <td style="color: var(--secondary); font-weight: 600;">91%</td>
+                        </tr>
+                        <tr>
+                            <td>Dec 13, 2024</td>
+                            <td>C-1</td>
+                            <td>32</td>
+                            <td>4</td>
+                            <td>2</td>
+                            <td style="color: var(--secondary); font-weight: 600;">88%</td>
+                        </tr>
+                        <tr>
+                            <td>Dec 12, 2024</td>
+                            <td>A-1</td>
+                            <td>40</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td style="color: var(--secondary); font-weight: 600;">98%</td>
+                        </tr>
+                        <tr>
+                            <td>Dec 12, 2024</td>
+                            <td>B-1</td>
+                            <td>36</td>
+                            <td>2</td>
+                            <td>1</td>
+                            <td style="color: var(--secondary); font-weight: 600;">94%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '🌙';
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeToggle.textContent = '☀️';
+            }
+            localStorage.setItem('theme', theme);
+        }
+        
+        setTheme(savedTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.body.classList.contains('dark-mode');
+            setTheme(isDark ? 'light' : 'dark');
+        });
+
+        // Export functionality
+        document.querySelectorAll('.btn').forEach(btn => {
+            if (btn.textContent === 'Export to CSV') {
+                btn.addEventListener('click', () => alert('CSV export initiated. File will download shortly.'));
+            }
+            if (btn.textContent === 'Print Report') {
+                btn.addEventListener('click', () => window.print());
+            }
+        });
+    </script>
+</body>
+</html>
