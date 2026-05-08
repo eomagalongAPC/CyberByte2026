@@ -50,12 +50,16 @@
 
         /* --- Sidebar Navigation (Desktop) --- */
         nav {
-            width: 238px;
+            flex: 0 0 240px;
+            width: 240px;
             background-color: var(--bg-card);
             display: flex;
             flex-direction: column;
             padding: 24px;
             border-right: 1px solid var(--border-color);
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
         }
 
         /* Hide sidebar on small mobile devices (except landscape) */
@@ -64,11 +68,11 @@
         .brand-section { border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 30px; }
         .brand-name { font-size: 1.25rem; font-weight: 800; color: var(--text-main); }
         .brand-sub { font-size: 0.9rem; color: var(--text-sub); }
-        .nav-link { color: var(--text-sub); text-decoration: none; padding: 12px 0; display: flex; align-items: center; gap: 10px; font-weight: 500; transition: 0.2s; }
-        .nav-link:hover, .nav-link.active { color: var(--primary); }
+        .nav-link { color: var(--text-sub); text-decoration: none; width: 100%; box-sizing: border-box; padding: 12px 14px; display: flex; align-items: center; gap: 10px; font-weight: 500; border-radius: 12px; transition: background-color 0.2s, color 0.2s; }
+        .nav-link:hover, .nav-link.active { color: var(--primary); background: var(--primary-light); }
 
         /* --- Main Content Area --- */
-        main { flex: 1; padding: 12px 14px; min-width: 0; overflow: hidden; display: flex; flex-direction: column; }
+        main { flex: 1; padding: 12px 14px; min-width: 0; min-height: 0; overflow-y: scroll; scrollbar-gutter: stable; display: flex; flex-direction: column; }
 
         /* --- Page Header (Combined) --- */
         .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 12px; }
@@ -163,8 +167,8 @@
 
     <nav>
         <div class="brand-section">
-            <div class="brand-name">SHS BootCamp</div>
-            <div class="brand-sub">Campus Admin Dashboard</div>
+            <div class="brand-name">Campus Admin</div>
+            <div class="brand-sub">Dashboard System</div>
         </div>
         <a href="index.html" class="nav-link active"><span>📊</span> Dashboard Overview</a>
         <a href="qr-scanner.html" class="nav-link"><span>📱</span> QR Scanner</a>

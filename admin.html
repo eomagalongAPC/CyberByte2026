@@ -55,6 +55,7 @@
             background: var(--bg-body);
             color: var(--text-main);
 
+            display: flex;
             overflow: hidden;
         }
 
@@ -63,10 +64,7 @@
         ========================== */
 
         nav {
-            position: fixed;
-
-            top: 0;
-            left: 0;
+            flex: 0 0 240px;
 
             width: 240px;
             height: 100vh;
@@ -79,7 +77,7 @@
 
             overflow-y: auto;
 
-            z-index: 1000;
+            flex-shrink: 0;
         }
 
         .brand-section {
@@ -104,20 +102,26 @@
             align-items: center;
             gap: 10px;
 
+            width: 100%;
+            box-sizing: border-box;
+
             text-decoration: none;
 
             color: var(--text-sub);
 
-            padding: 12px 0;
+            padding: 12px 14px;
 
             font-weight: 600;
 
-            transition: 0.2s;
+            border-radius: 12px;
+
+            transition: background-color 0.2s, color 0.2s;
         }
 
         .nav-link:hover,
         .nav-link.active {
             color: var(--primary);
+            background: var(--primary-light);
         }
 
         /* =========================
@@ -125,11 +129,14 @@
         ========================== */
 
         main {
-            margin-left: 240px;
+            flex: 1;
 
+            min-width: 0;
+            min-height: 0;
             height: 100vh;
 
-            overflow-y: auto;
+            overflow-y: scroll;
+            scrollbar-gutter: stable;
 
             padding: 20px;
         }
@@ -494,24 +501,24 @@
         </div>
     </div>
 
-    <a href="index.html" class="nav-link active">
-        📊 Dashboard
+    <a href="index.html" class="nav-link">
+        <span>📊</span> Dashboard
     </a>
 
     <a href="qr-scanner.html" class="nav-link">
-        📱 QR Scanner
+        <span>📱</span> QR Scanner
     </a>
 
     <a href="student-registration.html" class="nav-link">
-        👥 Students Registration
+        <span>👥</span> Students Registration
     </a>
 
     <a href="reports.html" class="nav-link">
-        📈 Reports
+        <span>📈</span> Reports
     </a>
 
-    <a href="admin.html" class="nav-link">
-        ⚙️ Admin Panel
+    <a href="admin.html" class="nav-link active">
+        <span>⚙️</span> Admin Panel
     </a>
 
 </nav>
