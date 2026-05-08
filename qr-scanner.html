@@ -7,29 +7,29 @@
     <style>
         /* Base Styling & Variables */
         :root {
-            --primary: #4F46E5;
-            --primary-light: rgba(187, 215, 2, 0.1);
-            --secondary: #10B981;
-            --secondary-light: rgba(16, 185, 129, 0.1);
+            --primary: #0B2E78;
+            --primary-light: rgba(11, 46, 120, 0.12);
+            --secondary: #F5C400;
+            --secondary-light: rgba(245, 196, 0, 0.14);
             --danger: #EF4444;
             --danger-light: rgba(239, 68, 68, 0.1);
-            --accent: #A855F7;
-            --accent-light: rgba(168, 85, 247, 0.1);
+            --accent: #C78B00;
+            --accent-light: rgba(199, 139, 0, 0.12);
             
-            --bg-body: #F8FAFC;
+            --bg-body: #FFF4C1;
             --bg-card: #FFFFFF;
-            --border-color: #E2E8F0;
-            --text-main: #3f6294;
-            --text-sub: #6B7280;
+            --border-color: #E9D77A;
+            --text-main: #082B6B;
+            --text-sub: #274E8A;
             --font-main: 'Segoe UI', system-ui, sans-serif;
         }
 
         body.dark-mode {
-            --bg-body: #1a1f35;
-            --bg-card: #242d45;
-            --border-color: #3a4456;
-            --text-main: #e0e7ff;
-            --text-sub: #a0aec0;
+            --bg-body: #082B6B;
+            --bg-card: #113B8B;
+            --border-color: #1C4CA2;
+            --text-main: #FFF7D6;
+            --text-sub: rgba(255, 255, 255, 0.86);
         }
 
         * { box-sizing: border-box; }
@@ -88,6 +88,23 @@
 
         .refresh-btn { background: var(--primary); color: white; border: none; padding: 9px 16px; border-radius: 8px; font-weight: 600; font-size: 0.88rem; display: flex; align-items: center; gap: 8px; cursor: pointer; text-decoration: none; }
         .refresh-btn:hover { background: #4239d6; }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover { background: #dc2626; }
 
         .card {
             background: var(--bg-card); 
@@ -173,7 +190,7 @@
         <a href="qr-scanner.html" class="nav-link active"><span>📱</span> QR Scanner</a>
         <a href="student-registration.html" class="nav-link"><span>👥</span> Students Registry</a>
         <a href="reports.html" class="nav-link"><span>📈</span> Reports</a>
-        <a href="admin.html" class="nav-link"><span>⚙️</span> Admin Panel</a>
+        <a href="professor-login.html" class="nav-link"><span>⚙️</span> Professor Login</a>
     </nav>
 
     <main>
@@ -184,7 +201,8 @@
             </div>
             <div class="header-right">
                 <button id="theme-toggle" class="theme-btn" title="Toggle dark mode">☀️</button>
-                <a class="refresh-btn" href="admin.html">Admin Panel</a>
+                <a class="refresh-btn" href="professor-login.html">Professor Login</a>
+                <a class="logout-btn" href="login.html">Logout</a>
             </div>
         </div>
 

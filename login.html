@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Campus Portal</title>
+    <style>
+        :root {
+            --bg-1: #F5C400;
+            --bg-2: #082B6B;
+            --panel: rgba(8, 43, 107, 0.74);
+            --panel-border: rgba(245, 196, 0, 0.24);
+            --text-main: #FFF7D6;
+            --text-sub: rgba(255, 255, 255, 0.86);
+            --primary: #0B2E78;
+            --primary-2: #F5C400;
+            --accent: #F5C400;
+            --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+            --radius: 28px;
+            --font-main: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body.dark-mode {
+            --bg-1: #082B6B;
+            --bg-2: #061A3B;
+            --panel: rgba(6, 26, 59, 0.82);
+            --panel-border: rgba(245, 196, 0, 0.22);
+            --text-main: #FFFFFF;
+            --text-sub: rgba(255, 255, 255, 0.86);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            width: 100%;
+            min-height: 100%;
+            margin: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            color: var(--text-main);
+            background:
+                radial-gradient(circle at top left, rgba(245, 196, 0, 0.18), transparent 28%),
+                radial-gradient(circle at top right, rgba(11, 46, 120, 0.24), transparent 24%),
+                radial-gradient(circle at bottom center, rgba(255, 255, 255, 0.10), transparent 30%),
+                linear-gradient(160deg, var(--bg-1), var(--bg-2));
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 42px 42px;
+            mask-image: radial-gradient(circle at center, black 42%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .shell {
+            position: relative;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .theme-btn {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            z-index: 5;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(8, 43, 107, 0.50);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+        }
+
+        body.dark-mode .theme-btn {
+            background: rgba(245, 196, 0, 0.18);
+            color: white;
+        }
+
+        .card {
+            width: min(980px, 100%);
+            border: 1px solid var(--panel-border);
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            border-radius: var(--radius);
+            backdrop-filter: blur(18px);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 24px;
+            padding: 36px;
+            align-items: stretch;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            font-size: clamp(2.4rem, 5vw, 4.6rem);
+            line-height: 0.96;
+            margin: 0 0 16px 0;
+            letter-spacing: -0.05em;
+        }
+
+        .lead {
+            max-width: 52ch;
+            color: var(--text-sub);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+
+        .portal-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .portal-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+            padding: 18px 20px;
+            border-radius: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+            min-height: 84px;
+        }
+
+        .portal-link:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.24);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .portal-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            font-size: 1.4rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .badge-student { background: linear-gradient(135deg, #F5C400, #D49F00); }
+        .badge-professor { background: linear-gradient(135deg, #0B2E78, #123E93); }
+
+        .portal-link h2 {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .portal-link p {
+            margin: 2px 0 0 0;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+
+        .chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+
+        .chip {
+            padding: 9px 13px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.92);
+            font-size: 0.9rem;
+        }
+
+        .info-panel {
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04)),
+                rgba(15, 23, 42, 0.32);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .stat {
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-label {
+            display: block;
+            color: var(--text-sub);
+            font-size: 0.88rem;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+        }
+
+        .stat-note {
+            margin-top: 6px;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+
+        .footer-note {
+            color: var(--text-sub);
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 900px) {
+            body { overflow-y: auto; }
+            .hero { grid-template-columns: 1fr; padding: 24px; }
+        }
+
+        @media (max-width: 560px) {
+            .shell { padding: 14px; }
+            .card { border-radius: 22px; }
+            .hero { padding: 18px; gap: 18px; }
+            h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme" title="Toggle dark mode">☀️</button>
+    <main class="shell">
+        <section class="card" aria-labelledby="login-title">
+            <div class="hero">
+                <div>
+                    <div class="eyebrow">Campus Portal</div>
+                    <h1 id="login-title">Login</h1>
+                    <p class="lead">Choose the account type to continue.</p>
+                    <div class="chips">
+                        <span class="chip">Student</span>
+                        <span class="chip">Professor</span>
+                    </div>
+                </div>
+
+                <aside class="info-panel">
+                    <a class="portal-link" href="student-login.html">
+                        <div class="portal-badge badge-student">🎓</div>
+                        <div>
+                            <h2>Student Login</h2>
+                            <p>Open student access.</p>
+                        </div>
+                    </a>
+
+                    <a class="portal-link" href="professor-login.html">
+                        <div class="portal-badge badge-professor">⚙️</div>
+                        <div>
+                            <h2>Professor Login</h2>
+                            <p>Open professor access.</p>
+                        </div>
+                    </a>
+
+                    <div class="footer-note">Select one button to continue.</div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+
+        function applyTheme(theme) {
+            const isDark = theme === 'dark';
+            document.body.classList.toggle('dark-mode', isDark);
+            themeToggle.textContent = isDark ? '🌙' : '☀️';
+            localStorage.setItem('theme', theme);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const nextTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+            applyTheme(nextTheme);
+        });
+
+        applyTheme(localStorage.getItem('theme') || 'light');
+    </script>
+</body>
+</html>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Login</title>
+    <style>
+        :root {
+            --bg-1: #FFF4C1;
+            --bg-2: #F7E6A4;
+            --primary: #0B2E78;
+            --primary-light: rgba(11, 46, 120, 0.12);
+            --secondary: #F5C400;
+            --secondary-light: rgba(245, 196, 0, 0.14);
+            --accent: #C78B00;
+            --accent-light: rgba(199, 139, 0, 0.12);
+            --danger: #EF4444;
+            --danger-light: rgba(239, 68, 68, 0.1);
+            --bg-body: #FFF4C1;
+            --bg-card: #FFFFFF;
+            --border-color: #E9D77A;
+            --text-main: #082B6B;
+            --text-sub: #274E8A;
+            --shadow: 0 20px 70px rgba(15, 23, 42, 0.10);
+            --font-main: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body.dark-mode {
+            --bg-1: #082B6B;
+            --bg-2: #061A3B;
+            --bg-card: #113B8B;
+            --border-color: #1C4CA2;
+            --text-main: #FFFFFF;
+            --text-sub: rgba(255, 255, 255, 0.86);
+            --primary-light: rgba(245, 196, 0, 0.14);
+            --secondary-light: rgba(245, 196, 0, 0.18);
+            --accent-light: rgba(245, 196, 0, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            width: 100%;
+            min-height: 100%;
+            margin: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background:
+                radial-gradient(circle at top left, rgba(245, 196, 0, 0.20), transparent 30%),
+                radial-gradient(circle at top right, rgba(11, 46, 120, 0.14), transparent 26%),
+                linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+            color: var(--text-main);
+        }
+
+        body.logged-out {
+            overflow: auto;
+        }
+
+        .shell {
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        body.logged-out .shell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-btn {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            z-index: 10;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(8, 43, 107, 0.50);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+        }
+
+        body.dark-mode .theme-btn {
+            background: rgba(245, 196, 0, 0.18);
+            color: white;
+        }
+
+        .wrap {
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+        body.logged-out .wrap {
+            width: min(920px, 100%);
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .brand strong {
+            font-size: 1rem;
+        }
+
+        .brand small {
+            color: var(--text-sub);
+        }
+
+        .ghost-link,
+        .primary-link,
+        .danger-link,
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-radius: 12px;
+            padding: 10px 16px;
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+            font: inherit;
+        }
+
+        .ghost-link:hover,
+        .primary-link:hover,
+        .danger-link:hover,
+        .button:hover {
+            transform: translateY(-1px);
+        }
+
+        .primary-link,
+        .button.primary {
+            color: white;
+            background: var(--primary);
+        }
+
+        .ghost-link {
+            color: var(--text-main);
+            background: white;
+            border-color: var(--border-color);
+        }
+
+        .danger-link {
+            color: white;
+            background: var(--danger);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        body.logged-out .topbar {
+            display: none;
+        }
+
+        body.logged-out .hero {
+            margin-bottom: 0;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .hero-left {
+            padding: 24px;
+            background: linear-gradient(135deg, #F5C400, #E4B800 36%, #0B2E78 100%);
+            color: white;
+        }
+
+        .hero-left h1 {
+            font-size: clamp(2.8rem, 6vw, 4.2rem);
+            line-height: 0.96;
+            letter-spacing: -0.06em;
+        }
+
+        .subtitle {
+            max-width: 28ch;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.10);
+            color: rgba(255, 255, 255, 0.92);
+            font-size: 0.9rem;
+            margin-bottom: 14px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            line-height: 1;
+            letter-spacing: -0.05em;
+        }
+
+        .subtitle {
+            margin: 0;
+            max-width: 60ch;
+            color: rgba(255, 255, 255, 0.90);
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .hero-right {
+            padding: 24px;
+            display: grid;
+            gap: 12px;
+            align-content: start;
+        }
+
+        .hero-right .login-card {
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+            padding: 0;
+        }
+
+        .hero-right .note-box {
+            background: var(--secondary-light);
+            border: 1px solid var(--border-color);
+        }
+
+        .login-card {
+            background: linear-gradient(180deg, #FFFFFF, #FFF8DA);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 18px;
+        }
+
+        .login-card h2,
+        .panel h2 {
+            margin: 0 0 8px 0;
+            font-size: 1.15rem;
+        }
+
+        .login-card p,
+        .panel p,
+        .muted {
+            color: var(--text-sub);
+            line-height: 1.6;
+        }
+
+        .field {
+            display: grid;
+            gap: 6px;
+            margin-top: 14px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        input {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 14px;
+            font: inherit;
+            color: var(--text-main);
+            background: white;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .login-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .note-box {
+            border-radius: 18px;
+            padding: 16px;
+            background: var(--secondary-light);
+            border: 1px solid rgba(16, 185, 129, 0.20);
+        }
+
+        .dashboard {
+            display: none;
+            gap: 18px;
+        }
+
+        .dashboard.active {
+            display: grid;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .summary-card,
+        .panel {
+            padding: 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .label {
+            color: var(--text-sub);
+            font-size: 0.88rem;
+            margin-bottom: 6px;
+        }
+
+        .value {
+            font-size: 1.9rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 18px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .schedule-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .schedule-item {
+            display: grid;
+            grid-template-columns: 78px 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 14px;
+            border-radius: 18px;
+            border: 1px solid var(--border-color);
+            background: linear-gradient(180deg, #FFFFFF, #FBFDFF);
+        }
+
+        .time-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 10px;
+            border-radius: 999px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 0.85rem;
+        }
+
+        .schedule-title {
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .schedule-meta {
+            color: var(--text-sub);
+            font-size: 0.94rem;
+        }
+
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 999px;
+            font-size: 0.84rem;
+            font-weight: 800;
+            background: var(--secondary-light);
+            color: var(--secondary);
+        }
+
+        .status-tag.upcoming {
+            background: var(--accent-light);
+            color: #C2410C;
+        }
+
+        .qr-card {
+            display: grid;
+            gap: 14px;
+            justify-items: center;
+            text-align: center;
+        }
+
+        .qr-box {
+            display: grid;
+            gap: 10px;
+            justify-items: center;
+            padding: 18px;
+            width: 100%;
+            background: linear-gradient(180deg, #FFFFFF, #FFF8DA);
+            border: 1px solid var(--border-color);
+            border-radius: 22px;
+        }
+
+        .qr-image {
+            width: 220px;
+            height: 220px;
+            border-radius: 18px;
+            object-fit: cover;
+            background: white;
+        }
+
+        .sync-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .mini-box {
+            padding: 14px;
+            border-radius: 18px;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+        }
+
+        .mini-box strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .attendance-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .attendance-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .attendance-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 1020px) {
+            .hero,
+            .content-grid,
+            .summary-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .shell { padding: 14px; }
+            .hero,
+            .content-grid,
+            .summary-grid,
+            .mini-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero { gap: 14px; }
+            .schedule-item { grid-template-columns: 1fr; }
+            .topbar { flex-direction: column; align-items: flex-start; }
+            .qr-image { width: 180px; height: 180px; }
+            .hero-left h1 { font-size: 2.8rem; }
+        }
+    </style>
+</head>
+<body class="logged-out">
+    <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme" title="Toggle dark mode">☀️</button>
+    <div class="shell">
+        <div class="wrap">
+            <div class="topbar">
+                <div class="brand">
+                    <strong>Student Login</strong>
+                    <small id="session-label">Secure access</small>
+                </div>
+                <a class="ghost-link" href="login.html">Back to login</a>
+            </div>
+
+            <section class="hero card" id="login-hero">
+                <div class="hero-left card">
+                    <div class="eyebrow">🎓 Student Login</div>
+                    <h1>Student Login</h1>
+                    <p class="subtitle">Sign in with email to see your class schedule, QR session, and attendance.</p>
+
+                    <div class="hero-actions">
+                        <a class="primary-link" href="#login-form">Login</a>
+                        <a class="ghost-link" href="login.html">Back</a>
+                    </div>
+                </div>
+
+                <div class="hero-right card" id="login-form">
+                    <div class="login-card">
+                        <h2>Student email login</h2>
+                        <p>Enter your email to open the student dashboard.</p>
+                        <form id="loginForm">
+                            <div class="field">
+                                <label for="email">Email</label>
+                                <input id="email" type="email" placeholder="student@school.edu" required />
+                            </div>
+                            <div class="login-row">
+                                <button type="submit" class="button primary">Log in</button>
+                                <button type="button" id="demoFill" class="ghost-link">Demo</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="note-box">
+                        <strong>View</strong>
+                        <div class="muted">Schedule, QR, attendance.</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard" id="dashboard">
+                <section class="summary-grid" aria-label="Attendance summary">
+                    <div class="summary-card">
+                        <div class="label">Today</div>
+                        <div class="value" id="summaryToday">-</div>
+                        <div class="muted">Daily status.</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">This Week</div>
+                        <div class="value" id="summaryWeek">-</div>
+                        <div class="muted">Weekly rate.</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">This Month</div>
+                        <div class="value" id="summaryMonth">-</div>
+                        <div class="muted">Monthly summary.</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">Attendance Status</div>
+                        <div class="value" id="summaryStatus">-</div>
+                        <div class="muted" id="summaryStatusNote">Ready.</div>
+                    </div>
+                </section>
+
+                <section class="content-grid">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2 class="section-title">Schedule</h2>
+                            <span class="status-tag" id="currentStatusTag">Upcoming</span>
+                        </div>
+                        <div class="schedule-list" id="scheduleList"></div>
+                    </div>
+
+                    <div class="panel qr-card">
+                        <div class="panel-header" style="width:100%;">
+                            <h2 class="section-title">QR session</h2>
+                            <span class="status-tag upcoming" id="qrStateTag">Waiting</span>
+                        </div>
+
+                        <div class="qr-box">
+                            <img id="qrImage" class="qr-image" alt="Student class QR code" />
+                            <div>
+                                <strong id="qrClassName">No class selected</strong>
+                                <div class="muted" id="qrProfessor">Professor: -</div>
+                                <div class="muted" id="qrSession">Session: -</div>
+                            </div>
+                            <div class="sync-row">
+                                <button type="button" class="primary-link" id="syncQrBtn">Sync</button>
+                                <button type="button" class="ghost-link" id="refreshAttendanceBtn">Refresh</button>
+                            </div>
+                        </div>
+
+                        <div class="mini-grid">
+                            <div class="mini-box">
+                                <strong>Check-in time</strong>
+                                <div class="muted" id="checkInTime">-</div>
+                            </div>
+                            <div class="mini-box">
+                                <strong>Professor</strong>
+                                <div class="muted" id="currentProfessor">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-grid">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2 class="section-title">Attendance</h2>
+                            <a class="danger-link" href="login.html" id="logoutLink">Logout</a>
+                        </div>
+                        <div class="attendance-grid" id="attendanceDetails"></div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2 class="section-title">Profile</h2>
+                        </div>
+                        <div class="detail-grid">
+                            <div class="mini-box">
+                                <strong>Email</strong>
+                                <div class="muted" id="studentEmail">-</div>
+                            </div>
+                            <div class="mini-box">
+                                <strong>Student ID</strong>
+                                <div class="muted">SHS-2026-0148</div>
+                            </div>
+                            <div class="mini-box">
+                                <strong>Section</strong>
+                                <div class="muted">Grade 12 - STEM</div>
+                            </div>
+                            <div class="mini-box">
+                                <strong>Advisor note</strong>
+                                <div class="muted">Linked to the class window.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const classSession = {
+            subject: 'Homeroom and Attendance',
+            professor: 'Dominque Bueno',
+            room: 'Room 204',
+            time: '07:30 AM - 09:30 AM',
+            classStart: 7 * 60 + 30,
+            classEnd: 9 * 60 + 30,
+            qrStart: 7 * 60 + 30,
+            qrEnd: 8 * 60 + 0,
+            presentEnd: 7 * 60 + 40,
+            lateEnd: 8 * 60 + 0
+        };
+
+        const loginHero = document.getElementById('login-hero');
+        const dashboard = document.getElementById('dashboard');
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const demoFill = document.getElementById('demoFill');
+        const studentEmail = document.getElementById('studentEmail');
+        const scheduleList = document.getElementById('scheduleList');
+        const qrImage = document.getElementById('qrImage');
+        const qrClassName = document.getElementById('qrClassName');
+        const qrProfessor = document.getElementById('qrProfessor');
+        const qrSession = document.getElementById('qrSession');
+        const qrStateTag = document.getElementById('qrStateTag');
+        const currentStatusTag = document.getElementById('currentStatusTag');
+        const currentProfessor = document.getElementById('currentProfessor');
+        const checkInTime = document.getElementById('checkInTime');
+        const attendanceDetails = document.getElementById('attendanceDetails');
+        const summaryToday = document.getElementById('summaryToday');
+        const summaryWeek = document.getElementById('summaryWeek');
+        const summaryMonth = document.getElementById('summaryMonth');
+        const summaryStatus = document.getElementById('summaryStatus');
+        const summaryStatusNote = document.getElementById('summaryStatusNote');
+        const syncQrBtn = document.getElementById('syncQrBtn');
+        const refreshAttendanceBtn = document.getElementById('refreshAttendanceBtn');
+        const sessionLabel = document.getElementById('session-label');
+        const logoutLink = document.getElementById('logoutLink');
+        const themeToggle = document.getElementById('theme-toggle');
+
+        function currentMinutes() {
+            const now = new Date();
+            return now.getHours() * 60 + now.getMinutes();
+        }
+
+        function applyTheme(theme) {
+            const isDark = theme === 'dark';
+            document.body.classList.toggle('dark-mode', isDark);
+            themeToggle.textContent = isDark ? '🌙' : '☀️';
+            localStorage.setItem('theme', theme);
+        }
+
+        function resolveAttendanceState(nowMinutes) {
+            if (nowMinutes < classSession.classStart) {
+                return { classState: 'Upcoming', qrState: 'Waiting', qrActive: false, today: 'Upcoming', status: 'Upcoming', statusNote: 'Your class has not started yet.', attendanceDetail: 'Check back at 7:30 AM.' };
+            }
+
+            if (nowMinutes <= classSession.presentEnd) {
+                return { classState: 'In session', qrState: 'Open', qrActive: true, today: 'Present', status: 'Present', statusNote: 'You are inside the present window.', attendanceDetail: 'Present window: 7:30 AM to 7:40 AM.' };
+            }
+
+            if (nowMinutes <= classSession.qrEnd) {
+                return { classState: 'In session', qrState: 'Open', qrActive: true, today: 'Late', status: 'Late', statusNote: 'You are inside the late check-in window.', attendanceDetail: 'Late window: 7:41 AM to 8:00 AM.' };
+            }
+
+            if (nowMinutes <= classSession.classEnd) {
+                return { classState: 'In session', qrState: 'Closed', qrActive: false, today: 'Absent', status: 'Absent', statusNote: 'QR attendance is closed for this class.', attendanceDetail: 'After 8:00 AM, attendance is marked absent.' };
+            }
+
+            return { classState: 'Finished', qrState: 'Closed', qrActive: false, today: 'Absent', status: 'Absent', statusNote: 'The attendance window has ended for today.', attendanceDetail: 'After 8:00 AM, attendance is marked absent.' };
+        }
+
+        function makeSessionCode(studentEmailValue, className, professor) {
+            const base = `${studentEmailValue}|${className}|${professor}|${new Date().toDateString()}`;
+            let hash = 0;
+            for (let index = 0; index < base.length; index += 1) {
+                hash = (hash * 31 + base.charCodeAt(index)) >>> 0;
+            }
+            return `SESSION-${hash.toString(36).toUpperCase().slice(0, 8)}`;
+        }
+
+        function qrSvg(sessionText, professorText) {
+            return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                <svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 220 220">
+                    <rect width="220" height="220" rx="20" fill="#ffffff"/>
+                    <rect x="16" y="16" width="60" height="60" rx="8" fill="#0B2E78"/>
+                    <rect x="144" y="16" width="60" height="60" rx="8" fill="#0B2E78"/>
+                    <rect x="16" y="144" width="60" height="60" rx="8" fill="#0B2E78"/>
+                    <text x="110" y="188" text-anchor="middle" font-size="12" fill="#4B5563" font-family="Segoe UI, sans-serif">${sessionText}</text>
+                    <text x="110" y="204" text-anchor="middle" font-size="10" fill="#082B6B" font-family="Segoe UI, sans-serif">${professorText}</text>
+                </svg>
+            `)}`;
+        }
+
+        function renderSchedule(studentEmailValue) {
+            const nowMinutes = currentMinutes();
+            const attendanceState = resolveAttendanceState(nowMinutes);
+            const sessionCode = makeSessionCode(studentEmailValue, classSession.subject, classSession.professor);
+            const checkInStamp = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+            scheduleList.innerHTML = '';
+            const row = document.createElement('div');
+            row.className = 'schedule-item';
+            row.innerHTML = `
+                <div class="time-pill">${classSession.time.split(' - ')[0]}</div>
+                <div>
+                    <div class="schedule-title">${classSession.subject}</div>
+                    <div class="schedule-meta">${classSession.professor} • ${classSession.room}</div>
+                </div>
+                <span class="status-tag ${attendanceState.classState === 'Upcoming' ? 'upcoming' : ''}">${attendanceState.classState}</span>
+            `;
+            scheduleList.appendChild(row);
+
+            qrClassName.textContent = classSession.subject;
+            qrProfessor.textContent = `Professor: ${classSession.professor}`;
+            qrSession.textContent = `Session: ${sessionCode}`;
+            qrStateTag.textContent = attendanceState.qrState;
+            qrStateTag.className = `status-tag ${attendanceState.qrActive ? '' : 'upcoming'}`;
+            currentStatusTag.textContent = attendanceState.classState;
+            currentStatusTag.className = `status-tag ${attendanceState.classState === 'Upcoming' ? 'upcoming' : ''}`;
+            currentProfessor.textContent = classSession.professor;
+            checkInTime.textContent = checkInStamp;
+            qrImage.src = qrSvg(sessionCode, classSession.professor.split(' ').slice(-1)[0]);
+
+            summaryToday.textContent = attendanceState.today;
+            summaryWeek.textContent = 'Attendance tied to the active class window';
+            summaryMonth.textContent = 'Attendance recorded daily';
+            summaryStatus.textContent = attendanceState.status;
+            summaryStatusNote.textContent = attendanceState.statusNote;
+
+            attendanceDetails.innerHTML = '';
+            [
+                ['Class time', classSession.time],
+                ['Professor', classSession.professor],
+                ['QR attendance', attendanceState.qrActive ? 'Open' : 'Closed'],
+                ['Attendance result', attendanceState.attendanceDetail]
+            ].forEach(([label, value]) => {
+                const item = document.createElement('div');
+                item.className = 'attendance-item';
+                item.innerHTML = `<span>${label}</span><strong>${value}</strong>`;
+                attendanceDetails.appendChild(item);
+            });
+
+            syncQrBtn.disabled = !attendanceState.qrActive;
+            refreshAttendanceBtn.disabled = !attendanceState.qrActive;
+            syncQrBtn.textContent = attendanceState.qrActive ? 'Sync' : 'QR Closed';
+            refreshAttendanceBtn.textContent = attendanceState.qrActive ? 'Refresh' : 'Attendance closed';
+        }
+
+        function openDashboard(email) {
+            studentEmail.textContent = email;
+            sessionLabel.textContent = `Logged in as ${email}`;
+            renderSchedule(email);
+            document.body.classList.remove('logged-out');
+            loginHero.style.display = 'none';
+            dashboard.classList.add('active');
+        }
+
+        function syncCurrentClass() {
+            const email = studentEmail.textContent || emailInput.value.trim();
+            renderSchedule(email);
+        }
+
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const email = emailInput.value.trim();
+            if (!email) return;
+            localStorage.setItem('studentEmail', email);
+            openDashboard(email);
+        });
+
+        demoFill.addEventListener('click', () => {
+            emailInput.value = 'student@school.edu';
+            localStorage.setItem('studentEmail', emailInput.value);
+            openDashboard(emailInput.value);
+        });
+
+        syncQrBtn.addEventListener('click', syncCurrentClass);
+        refreshAttendanceBtn.addEventListener('click', syncCurrentClass);
+
+        logoutLink.addEventListener('click', () => {
+            localStorage.removeItem('studentEmail');
+        });
+
+        themeToggle.addEventListener('click', () => {
+            const nextTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+            applyTheme(nextTheme);
+        });
+
+        const storedEmail = localStorage.getItem('studentEmail');
+        applyTheme(localStorage.getItem('theme') || 'light');
+        if (storedEmail) {
+            emailInput.value = storedEmail;
+            openDashboard(storedEmail);
+        } else {
+            document.body.classList.add('logged-out');
+            qrImage.src = qrSvg('LOGIN-FIRST', 'STUDENT ACCESS');
+        }
+    </script>
+</body>
+</html>
